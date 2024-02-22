@@ -1,0 +1,99 @@
+openapi: 3.0.0
+servers: []
+info:
+  description: This API receives speed and vertical readings from skiers and snowboarders
+  version: "1.0.0"
+  title: Ski Tracking API
+  contact:
+    email: aaronzhang587@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: users
+    description: Operations available to users
+
+paths:
+  /readings/speed:
+    post:
+      tags:
+        - users
+      summary: adds a new speed reading
+      operationId: app.add_speed
+      description: Adds a new speed reading to the system
+      responses:
+        '201':
+          description: speed added
+        '400':
+          description: 'invalid input, object invalid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Speed'
+        description: Reading item to add
+  /readings/vertical:
+    post:
+      tags:
+        - users
+      summary: adds a new vertical reading
+      operationId: app.add_vertical
+      description: Adds a new vertical reading to the system
+      responses:
+        '201':
+          description: vertical added
+        '400':
+          description: 'invalid input, object invalid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vertical'
+        description: Reading item to add
+
+components:
+  schemas:
+    Speed:
+      type: object
+      required:
+        - user_id
+        - resort_name
+        - speed
+        - timestamp
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        resort_name:
+          type: string
+          example: Banff_Sunshine
+        speed:
+          type: integer
+          example: 60
+        timestamp:
+          type: string
+          format: date-time
+          example: '2016-08-29T09:12:33.001Z'
+    Vertical:
+      type: object
+      required:
+        - user_id
+        - resort_name
+        - vertical
+        - timestamp
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        resort_name:
+          type: string
+          example: Banff_Sunshine
+        vertical:
+          type: integer
+          example: 2500
+        timestamp:
+          type: string
+          format: date-time
+          example: '2016-08-29T09:12:33.001Z'

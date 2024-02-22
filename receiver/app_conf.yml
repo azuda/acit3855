@@ -1,0 +1,10 @@
+version: 1
+store_speed_event:
+  url: http://localhost:8090/readings/speed
+store_vertical_event:
+  url: http://localhost:8090/readings/vertical
+events:
+  hostname: kafka-acit3855.eastus2.cloudapp.azure.com
+  port: 9092
+  topic: events
+

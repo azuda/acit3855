@@ -1,0 +1,48 @@
+{
+  "num_speed": 58,
+  "num_vertical": 53,
+  "recent_speed": [
+    {
+      "msg_data": "User d290f1ee-6c54-4b01-90e6-d701748f0851 at Panorama with a speed of 75.",
+      "received_timestamp": "2024-01-22 10:44:21"
+    },
+    {
+      "msg_data": "User d290f1ee-6c54-4b01-90e6-d701748f0851 at Panorama with a speed of 75.",
+      "received_timestamp": "2024-01-22 10:44:21"
+    },
+    {
+      "msg_data": "User d290f1ee-6c54-4b01-90e6-d701748f0851 at Panorama with a speed of 75.",
+      "received_timestamp": "2024-01-22 10:44:21"
+    },
+    {
+      "msg_data": "User d290f1ee-6c54-4b01-90e6-d701748f0851 at Panorama with a speed of 75.",
+      "received_timestamp": "2024-01-22 10:44:21"
+    },
+    {
+      "msg_data": "User d290f1ee-6c54-4b01-90e6-d701748f0851 at Panorama with a speed of 75.",
+      "received_timestamp": "2024-01-22 10:44:21"
+    }
+  ],
+  "recent_vertical": [
+    {
+      "msg_data": "User d290f1ee-6c54-4b01-90e6-d701748f0851 at Banff_Sunshine with a vertical of 2222.",
+      "received_timestamp": "2024-01-22 10:44:21"
+    },
+    {
+      "msg_data": "User d290f1ee-6c54-4b01-90e6-d701748f0851 at Banff_Sunshine with a vertical of 2222.",
+      "received_timestamp": "2024-01-22 10:44:21"
+    },
+    {
+      "msg_data": "User d290f1ee-6c54-4b01-90e6-d701748f0851 at Banff_Sunshine with a vertical of 2222.",
+      "received_timestamp": "2024-01-22 10:44:21"
+    },
+    {
+      "msg_data": "User d290f1ee-6c54-4b01-90e6-d701748f0851 at Banff_Sunshine with a vertical of 2222.",
+      "received_timestamp": "2024-01-22 10:44:21"
+    },
+    {
+      "msg_data": "User d290f1ee-6c54-4b01-90e6-d701748f0851 at Banff_Sunshine with a vertical of 2222.",
+      "received_timestamp": "2024-01-22 10:44:21"
+    }
+  ]
+}

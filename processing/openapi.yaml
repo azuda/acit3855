@@ -1,0 +1,55 @@
+openapi: 3.0.0
+info:
+  description: This API provides event stats
+  version: "1.0.0"
+  title: Stats API
+  contact:
+    email: aaronzhang587@gmail.com
+
+paths:
+  /stats:
+    get:
+      summary: Gets the event stats
+      operationId: app.get_stats
+      description: Gets processsed statistics for Speed and Vertical
+      responses:
+        '200':
+          description: Successfully returned processed stats
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/ReadingStats'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+components:
+  schemas:
+    ReadingStats:
+      required:
+      - num_speed_readings
+      - max_speed_reading
+      - num_vertical_readings
+      - max_vertical_reading
+      properties:
+        num_speed_readings:
+          type: integer
+          example: 500000
+        max_speed_reading:
+          type: integer
+          example: 99
+        num_vertical_readings:
+          type: integer
+          example: 500000
+        max_vertical_reading:
+          type: integer
+          example: 2699
+      type: object

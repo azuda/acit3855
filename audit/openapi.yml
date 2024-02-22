@@ -1,0 +1,127 @@
+openapi: 3.0.0
+info:
+  description: This API provides audit info
+  version: "1.0.0"
+  title: Audit API
+  contact:
+    email: aaronzhang587@gmail.com
+paths:
+  /speed:
+    get:
+      summary: gets a speed reading from history
+      operationId: app.get_speed_reading
+      description: Gets speed readings from the event store
+      parameters:
+      - name: index
+        in: query
+        description: Gets the speed at the index in the event store
+        schema:
+          type: integer
+          example: 100
+      responses:
+        '200':
+          description: Successfully returned a speed event
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/SpeedReading'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /vertical:
+    get:
+      summary: gets a vertical reading from history
+      operationId: app.get_vertical_reading
+      description: Gets vertical reading from the event store
+      parameters:
+      - name: index
+        in: query
+        description: Gets the vertical at the index in the event store
+        schema:
+          type: integer
+          example: 100
+      responses:
+        '200':
+          description: Successfully returned a vertical event
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/VerticalReading'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Not Found
+
+components:
+  schemas:
+    SpeedReading:
+      required:
+      - user_id
+      - resort_name
+      - speed
+      - timestamp
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        resort_name:
+          type: string
+          example: Revelstoke
+        speed:
+          type: integer
+          example: 77
+        timestamp:
+          type: string
+          format: date-time
+          example: 2016-08-29T09:12:33.001Z
+      type: object
+    VerticalReading:
+      required:
+      - user_id
+      - resort_name
+      - vertical
+      - timestamp
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        resort_name:
+          type: string
+          example: Revelstoke
+        vertical:
+          type: integer
+          example: 2320
+        timestamp:
+          type: string
+          format: date-time
+          example: 2016-08-29T09:12:33.001Z
+      type: object
+
