@@ -85,10 +85,8 @@ def get_vertical(start_time, end_time):
   # end_time_datetime = datetime.datetime.strptime(end_time, "%Y-%m-%dT%H:%M:%S")
   # start_time_datetime = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S.%f%z")
   # end_time_datetime = datetime.datetime.strptime(end_time, "%Y-%m-%dT%H:%M:%S.%f%z")
-  start_time = start_time.replace(':', '', 1)
-  end_time = end_time.replace(':', '', 1)
-  start_time_datetime = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S.%f%Z")
-  end_time_datetime = datetime.datetime.strptime(end_time, "%Y-%m-%dT%H:%M:%S.%f%Z")
+  start_time_datetime = parse_datetime_with_tz(start_time)
+  end_time_datetime = parse_datetime_with_tz(end_time)
 
   results = session.query(Vertical).filter(Vertical.date_created >= start_time_datetime, 
                                             Vertical.date_created < end_time_datetime)
@@ -150,6 +148,12 @@ def process_messages():
 
     # Commit the new message as being read
     consumer.commit_offsets()
+
+def parse_datetime_with_tz(dt_str):
+    dt_str, _, us = dt_str.partition(".")
+    dt = datetime.datetime.strptime(dt_str, "%Y-%m-%dT%H:%M:%S")
+    us = int(us.rstrip("Z"), 10)
+    return dt + datetime.timedelta(microseconds=us)
 
 
 app = connexion.FlaskApp(__name__, specification_dir='')
