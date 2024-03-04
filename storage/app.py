@@ -63,8 +63,10 @@ def get_speed(start_time, end_time):
 
   # start_time_datetime = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S")
   # end_time_datetime = datetime.datetime.strptime(end_time, "%Y-%m-%dT%H:%M:%S")
-  start_time_datetime = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S.%f%z")
-  end_time_datetime = datetime.datetime.strptime(end_time, "%Y-%m-%dT%H:%M:%S.%f%z")
+  # start_time_datetime = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S.%f%z")
+  # end_time_datetime = datetime.datetime.strptime(end_time, "%Y-%m-%dT%H:%M:%S.%f%z")
+  start_time_datetime = parse_datetime_with_tz(start_time)
+  end_time_datetime = parse_datetime_with_tz(end_time)
 
   results = session.query(Speed).filter(Speed.date_created >= start_time_datetime, 
                                         Speed.date_created < end_time_datetime)
