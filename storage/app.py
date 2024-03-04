@@ -1,4 +1,4 @@
-import connexion, yaml, logging, logging.config, datetime, json
+import connexion, yaml, logging, logging.config, datetime, json, re
 from connexion import NoContent
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -150,10 +150,16 @@ def process_messages():
     consumer.commit_offsets()
 
 def parse_datetime_with_tz(dt_str):
-    dt_str, _, us = dt_str.partition(".")
+  match = re.match(r"(.*)(\.\d+)([-+]\d+:\d+)", dt_str)
+  if match is not None:
+    dt_str, us_str, tz_str = match.groups()
+    us = int(us_str.lstrip("."), 10)
+    tz_hours, tz_minutes = map(int, tz_str.split(":"))
+    tz_delta = datetime.timedelta(hours=tz_hours, minutes=tz_minutes)
+    tz = datetime.timezone(tz_delta)
     dt = datetime.datetime.strptime(dt_str, "%Y-%m-%dT%H:%M:%S")
-    us = int(us.rstrip("Z"), 10)
-    return dt + datetime.timedelta(microseconds=us)
+    return dt.replace(microsecond=us, tzinfo=tz)
+
 
 
 app = connexion.FlaskApp(__name__, specification_dir='')
