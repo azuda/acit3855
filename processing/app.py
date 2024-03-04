@@ -5,6 +5,8 @@ from sqlalchemy.orm import sessionmaker
 from apscheduler.schedulers.background import BackgroundScheduler
 from base import Base
 from stats import Stats
+from connexion.middleware import MiddlewarePosition
+from starlette.middleware.cors import CORSMiddleware
 
 
 # read app config
@@ -157,6 +159,14 @@ def init_scheduler():
 app = connexion.FlaskApp(__name__, specification_dir='')
 app.add_api("openapi.yaml", strict_validation=True, validate_responses=True)
 
+app.add_middleware(
+  CORSMiddleware,
+  position=MiddlewarePosition.BEFORE_EXCEPTION,
+  allow_origins=["*"],
+  allow_credentials=True,
+  allow_methods=["*"],
+  allow_headers=["*"],
+)
 
 if __name__ == "__main__":
   init_scheduler()

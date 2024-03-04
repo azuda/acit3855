@@ -1,5 +1,7 @@
 import connexion, yaml, logging, logging.config, json
 from pykafka import KafkaClient
+from connexion.middleware import MiddlewarePosition
+from starlette.middleware.cors import CORSMiddleware
 
 
 with open('app_conf.yml', 'r') as f:
@@ -68,6 +70,14 @@ def get_vertical_reading(index):
 app = connexion.FlaskApp(__name__, specification_dir='')
 app.add_api("openapi.yml", strict_validation=True, validate_responses=True)
 
+app.add_middleware(
+  CORSMiddleware,
+  position=MiddlewarePosition.BEFORE_EXCEPTION,
+  allow_origins=["*"],
+  allow_credentials=True,
+  allow_methods=["*"],
+  allow_headers=["*"],
+)
 
 if __name__ == "__main__":
   app.run(port=8110)
