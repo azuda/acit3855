@@ -126,11 +126,8 @@ def populate_stats():
   # log trace_id of processed events
   for event in speed_events + vertical_events:
     event_type = "speed" if "speed" in event else "vertical"
-    try:
-      logger.debug(f"Processed new {event_type} reading with trace_id {event["trace_id"]}")
-      # print(f"Processed new {event_type} reading with trace_id {event["trace_id"]}")
-    except:
-      logger.debug(f"Processing new {event_type} bad trace_id")
+    # logger.debug(f"Processed new {event_type} reading with trace_id {event["trace_id"]}")
+    # print(f"Processed new {event_type} reading with trace_id {event["trace_id"]}")
   
   # write new row to stats table
   row = Stats(stats["num_speed_readings"],
