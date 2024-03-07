@@ -2,6 +2,12 @@
 
 Aaron Zhang A01316218
 
-Messaging Service for ACIT3855
+Ski Tracking API for ACIT3855
 
+Services:
+- receiver
+- storage
+- processing
+- audit
+- messaging
 
