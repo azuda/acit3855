@@ -9,7 +9,9 @@ export default function EndpointAudit(props) {
 	// const rand_val = 0; // default to 0
 
     const [index, setIndex] = useState(null);
-    setIndex(rand_val);
+    useEffect(() => {
+        setIndex(rand_val);
+    }, []);
 
     const getAudit = () => {
         fetch(`http://kafka-acit3855.eastus2.cloudapp.azure.com:8110/${props.endpoint}?index=${rand_val}`)
