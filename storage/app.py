@@ -27,8 +27,8 @@ db_name = app_config['datastore']['db']
 # DB_ENGINE = create_engine(f"mysql+pymysql://{user}:{password}@{hostname}:{port}/{db_name}")
 DB_ENGINE = create_engine(
   f"mysql+pymysql://{user}:{password}@{hostname}:{port}/{db_name}",
-  pool_size=20,       # maximum number of db connections in pool
-  pool_recycle=3600,  # seconds for a connection to get recycled
+  pool_size=20,       # max number of db connections in pool
+  pool_recycle=60,    # auto recycle connection after 60 secs
   pool_pre_ping=True  # test connections are alive on each checkout
 )
 Base.metadata.bind = DB_ENGINE
