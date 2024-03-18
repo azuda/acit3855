@@ -19,9 +19,12 @@ logger = logging.getLogger("basicLogger")
 
 # connect to Kafka
 attempts = 0
+hostname = app_config["events"]["hostname"]
+port = app_config["events"]["port"]
+host = f"{hostname}:{port}"
 while attempts < app_config["events"]["max_retries"]:
   try:
-    client = KafkaClient(hosts=f"{app_config["events"]["hostname"]}:{app_config["events"]["port"]}")
+    client = KafkaClient(hosts=host)
     topic = client.topics[str.encode(app_config["events"]["topic"])]
     producer = topic.get_sync_producer()
     logger.info(f"Connecting to Kafka - attempts: {attempts+1}")
