@@ -23,6 +23,7 @@ while attempts < app_config["events"]["max_retries"]:
   try:
     client = KafkaClient(hosts=f"{app_config["events"]["hostname"]}:{app_config["events"]["port"]}")
     topic = client.topics[str.encode(app_config["events"]["topic"])]
+    producer = topic.get_sync_producer()
     logger.info(f"Connecting to Kafka - attempts: {attempts+1}")
     break
   except:
@@ -41,14 +42,14 @@ def add_speed(body):
   
   # client = KafkaClient(hosts=f"{app_config["events"]["hostname"]}:{app_config["events"]["port"]}")
   # topic = client.topics[str.encode(app_config["events"]["topic"])]
-  producer = topic.get_sync_producer()
+  # producer = topic.get_sync_producer()
   msg = {
     "type": "speed",
     "datetime" : datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
     "payload": body
   }
   msg_str = json.dumps(msg)
-  producer.produce(msg_str.encode('utf-8'))
+  producer.produce(msg_str.encode("utf-8"))
   logger.info(f"msg_str:\n{msg_str}")
   # logger.info(f"Returned event speed response (Id: ${trace_id}) with status f{response.status_code}")
   logger.info(f"Returned event speed response (Id: ${trace_id})")
@@ -64,7 +65,7 @@ def add_vertical(body):
   
   # client = KafkaClient(hosts=f'{app_config["events"]["hostname"]}:{app_config["events"]["port"]}')
   # topic = client.topics[str.encode(app_config["events"]["topic"])]
-  producer = topic.get_sync_producer()
+  # producer = topic.get_sync_producer()
   msg = {
     "type": "vertical",
     "datetime" : datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
