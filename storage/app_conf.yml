@@ -10,5 +10,5 @@ events:
   port: 9092
   topic: events
   max_retries: 10
-  retry_interval: 3
+  retry_interval: 5
 
