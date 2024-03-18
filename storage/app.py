@@ -1,4 +1,4 @@
-import connexion, yaml, logging, logging.config, datetime, json, re
+import connexion, yaml, logging, logging.config, datetime, json, re, time
 from connexion import NoContent
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -105,8 +105,22 @@ def process_messages():
   """ process event messages """
   hostname = "%s:%d" % (app_config["events"]["hostname"],
                         app_config["events"]["port"])
-  client = KafkaClient(hosts=hostname)
-  topic = client.topics[str.encode(app_config["events"]["topic"])]
+  
+  # client = KafkaClient(hosts=hostname)
+  # topic = client.topics[str.encode(app_config["events"]["topic"])]
+
+  attempts = 0
+  while attempts < app_config["events"]["max_retries"]:
+    try:
+      client = KafkaClient(hosts=hostname)
+      topic = client.topics[str.encode(app_config["events"]["topic"])]
+      logger.info(f"Connecting to Kafka - attempts: {attempts+1}")
+      break
+    except:
+      wait_time = app_config["events"]["retry_interval"]
+      logger.error(f"Can't connect to Kafka - retrying in {wait_time}s...")
+      time.sleep(wait_time)
+      attempts += 1
 
   # Create a consume on a consumer group, that only reads new messages
   # (uncommitted messages) when the service re-starts (i.e., it doesn't
