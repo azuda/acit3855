@@ -55,6 +55,7 @@ if not os.path.exists(filename):
     json.dump(data, f)
 
 # link to sqlite
+Base = declarative_base()
 DB_ENGINE = create_engine("sqlite:///%s" % filename)
 Base.metadata.bind = DB_ENGINE
 DB_SESSION = sessionmaker(bind=DB_ENGINE)
