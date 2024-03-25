@@ -2,6 +2,7 @@ import connexion, yaml, logging, logging.config, json, requests, datetime, os
 from connexion import NoContent
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 from apscheduler.schedulers.background import BackgroundScheduler
 from base import Base
 from stats import Stats
@@ -38,8 +39,16 @@ logger.info("App Conf File: %s" % app_conf_file)
 logger.info("Log Conf File: %s" % log_conf_file)
 
 
+# Base = declarative_base()
+filename = app_config["datastore"]["filename"]
+
+# create sqlite file if it does not exist
+if not os.path.exists(filename):
+    with open(filename, "w") as f:
+        json.dump({"speed": 0, "vertical": 0}, f)
+
 # link to sqlite
-DB_ENGINE = create_engine("sqlite:///%s" % app_config["datastore"]["filename"])
+DB_ENGINE = create_engine("sqlite:///%s" % filename)
 Base.metadata.bind = DB_ENGINE
 DB_SESSION = sessionmaker(bind=DB_ENGINE)
 
@@ -169,13 +178,13 @@ def populate_stats():
 
 def init_scheduler():
   sched = BackgroundScheduler(daemon=True)
-  sched.add_job(populate_stats, 'interval',
-                seconds=app_config['scheduler']['period_sec'],
+  sched.add_job(populate_stats, "interval",
+                seconds=app_config["scheduler"]["period_sec"],
                 max_instances=2)
   sched.start()
 
 
-app = connexion.FlaskApp(__name__, specification_dir='')
+app = connexion.FlaskApp(__name__, specification_dir="")
 app.add_api("openapi.yaml", strict_validation=True, validate_responses=True)
 
 CORS(app.app, resources={r"/*": {"origins": "*"}})
