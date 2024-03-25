@@ -46,7 +46,7 @@ export default function AppStats() {
 							<td colspan="2">Max Speed: {stats['max_speed_reading']}</td>
 						</tr>
 						<tr>
-							<td colspan="2">Max Vetical: {stats['max_vertical_reading']}</td>
+							<td colspan="2">Max Vertical: {stats['max_vertical_reading']}</td>
 						</tr>
 					</tbody>
                 </table>
