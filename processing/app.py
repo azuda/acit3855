@@ -2,7 +2,6 @@ import connexion, yaml, logging, logging.config, json, requests, datetime, os
 from connexion import NoContent
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
 from apscheduler.schedulers.background import BackgroundScheduler
 from base import Base
 from stats import Stats
@@ -45,11 +44,9 @@ filename = app_config["datastore"]["filename"]
 # create sqlite file if it does not exist
 if not os.path.exists(filename):
   with open(filename, "w") as f:
-    data = []
-    json.dump(data, f)
+    f.write("")
 
 # link to sqlite
-Base = declarative_base()
 DB_ENGINE = create_engine("sqlite:///%s" % filename)
 Base.metadata.bind = DB_ENGINE
 DB_SESSION = sessionmaker(bind=DB_ENGINE)
