@@ -45,7 +45,14 @@ filename = app_config["datastore"]["filename"]
 # create sqlite file if it does not exist
 if not os.path.exists(filename):
   with open(filename, "w") as f:
-    json.dump({"id": 1, "num_speed_readings": 0, "max_speed_reading": 0, "num_vertical_readings": 0, "max_vertical_reading": 0}, f)
+    data = {
+      "id": 1, 
+      "num_speed_readings": 0, 
+      "max_speed_reading": 0, 
+      "num_vertical_readings": 0, 
+      "max_vertical_reading": 0
+    }
+    json.dump(data, f)
 
 # link to sqlite
 DB_ENGINE = create_engine("sqlite:///%s" % filename)
