@@ -5,3 +5,8 @@ scheduler:
   period_sec: 10
 eventstore:
   url: http://localhost:8090
+event_log:
+  hostname: kafka-acit3855.eastus2.cloudapp.azure.com
+  port: 9092
+  topic: event_log
+  limit: 25

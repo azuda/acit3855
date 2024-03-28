@@ -6,6 +6,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from base import Base
 from stats import Stats
 from flask_cors import CORS
+from pykafka import KafkaClient
 
 
 # with open("app_conf.yml", "r") as f:
@@ -87,7 +88,13 @@ def populate_stats():
   # read stats sorted by last_updated
   session = DB_SESSION()
   current_stats = session.query(Stats).order_by(Stats.last_updated.desc()).all()
+  count = session.query(Stats).count()
   session.close()
+
+  # log event if message limit is reached
+  message_limit = app_config["event_log"]["limit"] 
+  if count >= message_limit:
+    event_log(0004)
 
   # populate stats table if empty
   if current_stats == []:
@@ -181,6 +188,33 @@ def init_scheduler():
                 seconds=app_config["scheduler"]["period_sec"],
                 max_instances=2)
   sched.start()
+  event_log(0003)
+
+
+def event_log(code):
+  message_limit = app_config["event_log"]["limit"]
+
+  if code == 0003:
+    event_log_message = {
+      "type": "connection",
+      "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
+      "message": f"0003 ~ Processing service successfully started"
+    }
+  if code == 0004:
+    event_log_message = {
+      "type": "connection",
+      "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
+      "message": f"0004 ~ Service received too many messages (limit: {message_limit})"
+    }
+  event_log_message_str = json.dumps(event_log_message)
+  hostname = app_config["event_log"]["hostname"]
+  port = app_config["event_log"]["port"]
+  host = f"{hostname}:{port}"
+  client = KafkaClient(hosts=host)
+  event_log_topic = client.topics[str.encode(app_config["event_log"]["topic"])]
+  event_log_producer = event_log_topic.get_sync_producer()
+  event_log_producer.produce(event_log_message_str.encode("utf-8"))
+  logger.info(f"Published message to event_log:\n{event_log_message_str}")
 
 
 app = connexion.FlaskApp(__name__, specification_dir="")

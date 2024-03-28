@@ -149,6 +149,18 @@ def process_messages():
       logger.error(f"Can't connect to Kafka - retrying in {wait_time}s...")
       time.sleep(wait_time)
       attempts += 1
+  
+  # publish message to event_log
+  event_log_message = {
+    "type": "connection",
+    "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
+    "message": "0002 ~ Ready to consume messages on topic 'events'"
+  }
+  event_log_message_str = json.dumps(event_log_message)
+  event_log_topic = client.topics[str.encode(app_config["event_log"]["topic"])]
+  event_log_producer = event_log_topic.get_sync_producer()
+  event_log_producer.produce(event_log_message_str.encode("utf-8"))
+  logger.info(f"Published message to event_log:\n{event_log_message_str}")
 
   # Create a consume on a consumer group, that only reads new messages
   # (uncommitted messages) when the service re-starts (i.e., it doesn't
