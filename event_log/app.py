@@ -2,7 +2,7 @@ import connexion, json, time, os
 import yaml, logging, logging.config
 from pykafka import KafkaClient
 from pykafka.common import OffsetType
-from threading import Thread
+from apscheduler.schedulers.background import BackgroundScheduler
 
 
 if "TARGET_ENV" in os.environ and os.environ["TARGET_ENV"] == "test":
@@ -29,6 +29,8 @@ logger.info("Log Conf File: %s" % log_conf_file)
 
 def process_messages():
   """ process event_log messages """
+  logger.info("Periodic processing started")
+
   datastore = app_config["datastore"]["filename"]
   if not os.path.exists(datastore):
     with open(datastore, "w") as f:
@@ -95,13 +97,19 @@ def event_stats():
 
   return results, 200
 
+def init_scheduler():
+  sched = BackgroundScheduler(daemon=True)
+  sched.add_job(process_messages, "interval",
+                seconds=app_config["scheduler"]["period_sec"],
+                max_instances=2)
+  sched.start()
+
 
 app = connexion.FlaskApp(__name__, specification_dir="")
 app.add_api("openapi.yaml", strict_validation=True, validate_responses=True)
 
 
 if __name__ == "__main__":
-  t1 = Thread(target=process_messages, daemon=True)
-  t1.start()
+  init_scheduler()
   app.run(port=8120)
 
