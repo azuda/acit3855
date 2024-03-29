@@ -114,7 +114,7 @@ services:
     image: event_log
     ports:
       - "8120:8120"
-    network_mode: "host"
+    # network_mode: "host"
     environment:
       - TARGET_ENV=test
     volumes:
