@@ -1,0 +1,53 @@
+openapi: 3.0.0
+info:
+  description: This API consumes Kafka events from the event_log topic
+  version: "1.0.0"
+  title: Event Logger Service
+  contact:
+    email: aaronzhang587@gmail.com
+
+paths:
+  /event_stats:
+    get:
+      summary: Gets the event stats
+      operationId: app.event_stats
+      description: Gets statistics for event_log messages
+      responses:
+        '200':
+          description: Successfully returned event_log stats
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventStats'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+components:
+  schemas:
+    EventStats:
+      required:
+      - "0001"
+      - "0002"
+      - "0003"
+      - "0004"
+      properties:
+        "0001":
+          type: integer
+          example: 1
+        "0002":
+          type: integer
+          example: 7
+        "0003":
+          type: integer
+          example: 3
+        "0004":
+          type: integer
+          example: 6
+      type: object

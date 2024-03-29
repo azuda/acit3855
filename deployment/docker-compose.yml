@@ -110,7 +110,23 @@ services:
       - "processing"
       - "audit"
 
-# Names our volume
+  event_log:
+    image: event_log
+    ports:
+      - "8120:8120"
+    network_mode: "host"
+    environment:
+      - TARGET_ENV=test
+    volumes:
+      - /home/azureuser/config/event_log:/config
+      - /home/azureuser/logs:/logs
+      - event-db:/data
+    depends_on:
+      - "kafka"
+      - "storage"
+
+# name our volumes
 volumes:
   my-db:
   processing-db:
+  event-db:
