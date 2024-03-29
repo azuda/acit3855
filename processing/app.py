@@ -1,4 +1,4 @@
-import connexion, yaml, logging, logging.config, json, requests, datetime, os
+import connexion, yaml, logging, logging.config, json, requests, datetime, os, uuid
 from connexion import NoContent
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -196,15 +196,17 @@ def event_log(code):
 
   if code == 0003:
     event_log_message = {
-      "type": "connection",
-      "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
-      "message": f"0003 ~ Processing service successfully started"
+      "id": str(uuid.uuid4()),
+      "message": "0003 ~ Processing service successfully started",
+      "code": "0003",
+      "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
     }
   if code == 0004:
     event_log_message = {
-      "type": "connection",
-      "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
-      "message": f"0004 ~ Service received too many messages (limit: {message_limit})"
+      "id": str(uuid.uuid4()),
+      "message": f"0004 ~ Service received too many messages (limit: {message_limit})",
+      "code": "0004",
+      "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
     }
   event_log_message_str = json.dumps(event_log_message)
   hostname = app_config["event_log"]["hostname"]

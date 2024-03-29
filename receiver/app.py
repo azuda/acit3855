@@ -58,9 +58,10 @@ while attempts < app_config["events"]["max_retries"]:
 
 # publish message to event_log
 event_log_message = {
-  "type": "connection",
-  "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
-  "message": "0001 ~ Ready to receive messages on RESTful API:8080"
+  "id": str(uuid.uuid4()),
+  "message": "0001 ~ Ready to receive messages on RESTful API:8080",
+  "code": "0001",
+  "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 }
 event_log_message_str = json.dumps(event_log_message)
 event_log_topic = client.topics[str.encode(app_config["event_log"]["topic"])]

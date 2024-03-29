@@ -1,4 +1,4 @@
-import connexion, yaml, logging, logging.config, datetime, json, re, time, os
+import connexion, yaml, logging, logging.config, datetime, json, re, time, os, uuid
 from connexion import NoContent
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -152,9 +152,10 @@ def process_messages():
   
   # publish message to event_log
   event_log_message = {
-    "type": "connection",
-    "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
-    "message": "0002 ~ Ready to consume messages on topic 'events'"
+  "id": str(uuid.uuid4()),
+  "message": "0002 ~ Ready to consume messages on topic 'events'",
+  "code": "0002",
+  "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
   }
   event_log_message_str = json.dumps(event_log_message)
   event_log_topic = client.topics[str.encode(app_config["event_log"]["topic"])]
