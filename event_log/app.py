@@ -30,12 +30,7 @@ logger.info("Log Conf File: %s" % log_conf_file)
 def process_messages():
   """ process event_log messages """
   logger.info("Periodic processing started")
-
   datastore = app_config["datastore"]["filename"]
-  if not os.path.exists(datastore):
-    with open(datastore, "w") as f:
-      f.write("[]")
-
   hostname = "%s:%d" % (app_config["event_log"]["hostname"],
                         app_config["event_log"]["port"])
 
@@ -97,6 +92,13 @@ def event_stats():
 
   return results, 200
 
+def init_datastore():
+  datastore = app_config["datastore"]["filename"]
+  if not os.path.exists(datastore):
+    with open(datastore, "w") as f:
+      f.write("[]")
+  return True
+
 def init_scheduler():
   sched = BackgroundScheduler(daemon=True)
   sched.add_job(process_messages, "interval",
@@ -110,6 +112,7 @@ app.add_api("openapi.yaml", strict_validation=True, validate_responses=True)
 
 
 if __name__ == "__main__":
+  init_datastore()
   init_scheduler()
   app.run(port=8120)
 
