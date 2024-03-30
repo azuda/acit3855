@@ -104,8 +104,7 @@ def event_stats():
 def init_scheduler():
   sched = BackgroundScheduler(daemon=True)
   sched.add_job(process_messages, "interval",
-                seconds=app_config["scheduler"]["period_sec"],
-                max_instances=2)
+                seconds=app_config["scheduler"]["period_sec"])
   sched.start()
 
 
