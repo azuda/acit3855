@@ -77,8 +77,13 @@ def process_messages():
     consumer.commit_offsets()
 
 def event_stats():
+  datastore = app_config["datastore"]["filename"]
+  if not os.path.exists(datastore):
+    with open(datastore, "w") as f:
+      f.write("[]")
+
   # get results from event_stats.json
-  with open(app_config["datastore"]["filename"], "r") as f:
+  with open(datastore, "r") as f:
     msg_raw = json.loads(f.read())
 
   # count the number of messages for each code
@@ -91,13 +96,6 @@ def event_stats():
       results[code] += 1
 
   return results, 200
-
-def init_datastore():
-  datastore = app_config["datastore"]["filename"]
-  if not os.path.exists(datastore):
-    with open(datastore, "w") as f:
-      f.write("[]")
-  return True
 
 def init_scheduler():
   sched = BackgroundScheduler(daemon=True)
@@ -112,7 +110,6 @@ app.add_api("openapi.yaml", strict_validation=True, validate_responses=True)
 
 
 if __name__ == "__main__":
-  init_datastore()
   init_scheduler()
   app.run(port=8120)
 
