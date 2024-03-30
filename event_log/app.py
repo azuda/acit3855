@@ -89,6 +89,11 @@ def event_stats():
   # get results from event_stats.json
   with open(datastore, "r") as f:
     msg_raw = json.loads(f.read())
+  
+    # return 404 if no stats found
+    if msg_raw == []:
+      logger.error("No events found")
+      return "Events do not exist", 404
 
   # count the number of messages for each code
   results = {}
