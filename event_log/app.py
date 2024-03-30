@@ -31,6 +31,10 @@ def process_messages():
   """ process event_log messages """
   logger.info("Periodic processing started")
   datastore = app_config["datastore"]["filename"]
+  if not os.path.exists(datastore):
+    with open(datastore, "w") as f:
+      f.write("[]")
+
   hostname = "%s:%d" % (app_config["event_log"]["hostname"],
                         app_config["event_log"]["port"])
 
