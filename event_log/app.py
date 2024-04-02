@@ -71,6 +71,7 @@ def process_messages():
       data = json.loads(f.read())
 
     data.append(payload)
+    logger.info(f"Message added to file {datastore}: {payload}")
 
     with open(datastore, "w") as f:
       f.write(json.dumps(data, indent=4))
