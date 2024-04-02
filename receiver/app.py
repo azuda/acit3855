@@ -49,6 +49,7 @@ while attempts < app_config["events"]["max_retries"]:
     topic = client.topics[str.encode(app_config["events"]["topic"])]
     producer = topic.get_sync_producer()
     logger.info(f"Connecting to Kafka - attempts: {attempts+1}")
+    publish_event()
     break
   except:
     wait_time = app_config["events"]["retry_interval"]
@@ -56,19 +57,20 @@ while attempts < app_config["events"]["max_retries"]:
     time.sleep(wait_time)
     attempts += 1
 
-# publish message to event_log
-event_log_message = {
-  "id": str(uuid.uuid4()),
-  "message": "0001 ~ Ready to receive messages on RESTful API:8080",
-  "code": "0001",
-  "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-}
-event_log_message_str = json.dumps(event_log_message)
-event_log_topic = client.topics[str.encode(app_config["event_log"]["topic"])]
-event_log_producer = event_log_topic.get_sync_producer()
-event_log_producer.produce(event_log_message_str.encode("utf-8"))
-logger.info(f"Published message to event_log:\n{event_log_message_str}")
 
+def publish_event():
+  # publish message to event_log
+  event_log_message = {
+    "id": str(uuid.uuid4()),
+    "message": "0001 ~ Ready to receive messages on RESTful API:8080",
+    "code": "0001",
+    "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+  }
+  event_log_message_str = json.dumps(event_log_message)
+  event_log_topic = client.topics[str.encode(app_config["event_log"]["topic"])]
+  event_log_producer = event_log_topic.get_sync_producer()
+  event_log_producer.produce(event_log_message_str.encode("utf-8"))
+  logger.info(f"Published message to event_log:\n{event_log_message_str}")
 
 def add_speed(body):
   """ receives speed event """
