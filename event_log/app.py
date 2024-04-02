@@ -3,6 +3,7 @@ import yaml, logging, logging.config
 from pykafka import KafkaClient
 from pykafka.common import OffsetType
 from apscheduler.schedulers.background import BackgroundScheduler
+from threading import Thread
 
 
 if "TARGET_ENV" in os.environ and os.environ["TARGET_ENV"] == "test":
@@ -32,6 +33,7 @@ def process_messages():
   logger.info("Periodic processing started")
   datastore = app_config["datastore"]["filename"]
   if not os.path.exists(datastore):
+    logger.debug(f"Datastore {datastore} not found - creating empty {datastore}")
     with open(datastore, "w") as f:
       f.write("[]")
 
@@ -51,9 +53,6 @@ def process_messages():
       time.sleep(wait_time)
       attempts += 1
 
-  # Create a consume on a consumer group, that only reads new messages
-  # (uncommitted messages) when the service re-starts (i.e., it doesn't
-  # read all the old messages from the history in the message queue).
   consumer = topic.get_simple_consumer(consumer_group=b'event_group',
                                         reset_offset_on_start=False,
                                         auto_offset_reset=OffsetType.LATEST)
@@ -119,6 +118,8 @@ app.add_api("openapi.yaml", strict_validation=True, validate_responses=True)
 
 
 if __name__ == "__main__":
-  init_scheduler()
+  # init_scheduler()
+  t1 = Thread(target=process_messages, daemon=True)
+  t1.start()
   app.run(port=8120)
 
