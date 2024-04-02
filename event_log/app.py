@@ -28,14 +28,18 @@ logger.info("App Conf File: %s" % app_conf_file)
 logger.info("Log Conf File: %s" % log_conf_file)
 
 
+datastore = app_config["datastore"]["filename"]
+
+# create datastore if it does not exist
+if not os.path.exists(datastore):
+  logger.debug(f"Datastore {datastore} not found - creating empty {datastore}")
+  with open(datastore, "w") as f:
+    f.write("[]")
+
+
 def process_messages():
   """ process event_log messages """
   logger.info("Periodic processing started")
-  datastore = app_config["datastore"]["filename"]
-  if not os.path.exists(datastore):
-    logger.debug(f"Datastore {datastore} not found - creating empty {datastore}")
-    with open(datastore, "w") as f:
-      f.write("[]")
 
   hostname = "%s:%d" % (app_config["event_log"]["hostname"],
                         app_config["event_log"]["port"])
@@ -81,11 +85,6 @@ def process_messages():
     consumer.commit_offsets()
 
 def event_stats():
-  datastore = app_config["datastore"]["filename"]
-  if not os.path.exists(datastore):
-    with open(datastore, "w") as f:
-      f.write("[]")
-
   # get results from event_stats.json
   with open(datastore, "r") as f:
     msg_raw = json.loads(f.read())
