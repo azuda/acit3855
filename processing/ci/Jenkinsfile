@@ -1,3 +1,8 @@
-@Library("ci_functions@main") _
-python_build("audit", "audit")
+node {
+  stage("Load Shared Library") {
+    checkout scm
+    def pipelineScript = load "${env.WORKSPACE}/ci_lib/python_build.groovy"
+    pipelineScript.call("processing", "processing:latest")
+  }
+}
 
