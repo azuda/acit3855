@@ -22,7 +22,7 @@ def call(service, dockerRepoName, imageName) {
           chmod -R 755 .venv
           . .venv/bin/activate
           pip install bandit
-          bandit -r .
+          bandit -r ${service}
           """
         }
       }
@@ -30,9 +30,12 @@ def call(service, dockerRepoName, imageName) {
       stage("Package") {
         steps {
           withCredentials([string(credentialsId: "DockerHub", variable: "TOKEN")]) {
-            sh "docker login -u azuda -p $TOKEN docker.io"
-            sh "docker build -t ${dockerRepoName}:latest --tag azuda/${dockerRepoName}:${imageName} ."
-            sh "docker push azuda/${dockerRepoName}:${imageName}"
+            sh """
+            cd ${service}
+            docker login -u azuda -p $TOKEN docker.io
+            docker build -t ${dockerRepoName}:latest --tag azuda/${dockerRepoName}:${imageName} .
+            docker push azuda/${dockerRepoName}:${imageName}
+            """
           }
         }
       }
