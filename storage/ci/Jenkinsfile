@@ -1,0 +1,3 @@
+@Library("ci_lib@main") _
+python_build("storage", "storage", "svc_storage")
+
