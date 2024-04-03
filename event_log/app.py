@@ -4,6 +4,7 @@ from pykafka import KafkaClient
 from pykafka.common import OffsetType
 from apscheduler.schedulers.background import BackgroundScheduler
 from threading import Thread
+from flask_cors import CORS
 
 
 if "TARGET_ENV" in os.environ and os.environ["TARGET_ENV"] == "test":
@@ -108,6 +109,7 @@ def event_stats():
 app = connexion.FlaskApp(__name__, specification_dir="")
 app.add_api("openapi.yaml", strict_validation=True, validate_responses=True)
 
+CORS(app.app, resources={r"/*": {"origins": "*"}})
 
 if __name__ == "__main__":
   t1 = Thread(target=process_messages, daemon=True)
