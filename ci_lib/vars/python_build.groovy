@@ -19,6 +19,7 @@ def call(service, dockerRepoName, imageName) {
         steps {
           sh """
           python3 -m venv .venv
+          chmod -R 755 .venv
           source .venv/bin/activate
           pip install bandit
           bandit -r .
