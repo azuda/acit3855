@@ -56,11 +56,11 @@ while attempts < app_config["events"]["max_retries"]:
     client = KafkaClient(hosts=host)
     topic = client.topics[str.encode(app_config["events"]["topic"])]
     producer = topic.get_sync_producer()
-    logger.info(f"Connecting to Kafka - attempts: {attempts+1}")
+    logger.info("Connecting to Kafka - attempts: %s", attempts+1)
     break
   except:
     wait_time = app_config["events"]["retry_interval"]
-    logger.error(f"Can't connect to Kafka - retrying in {wait_time}s...")
+    logger.error("Can't connect to Kafka - retrying in %ss...", wait_time)
     time.sleep(wait_time)
     attempts += 1
 
@@ -75,14 +75,14 @@ event_log_message_str = json.dumps(event_log_message)
 event_log_topic = client.topics[str.encode(app_config["events"]["topic2"])]
 event_log_producer = event_log_topic.get_sync_producer()
 event_log_producer.produce(event_log_message_str.encode("utf-8"))
-logger.info(f"Published message to event_log:\n{event_log_message_str}")
+logger.info("Published message to event_log:\n%s", event_log_message_str)
 
 
 def add_speed(body):
   """ receives speed event """
   trace_id = str(uuid.uuid4())
   body["trace_id"] = trace_id
-  logger.info(f"Received event speed request with a trace id of {trace_id}")
+  logger.info("Received event speed request with a trace id of %s", trace_id)
   # response = requests.post(app_config["store_speed_event"]["url"],
   #                           json = body,
   #                           headers = {"Content-Type": "application/json"})
@@ -97,8 +97,8 @@ def add_speed(body):
   }
   msg_str = json.dumps(msg)
   producer.produce(msg_str.encode("utf-8"))
-  logger.info(f"msg_str:\n{msg_str}")
-  logger.info(f"Returned event speed response (Id: ${trace_id})")
+  logger.info("msg_str:\n%s", msg_str)
+  logger.info("Returned event speed response (Id: %s)", trace_id)
 
   return NoContent, 201
 
@@ -106,7 +106,7 @@ def add_vertical(body):
   """ receives vertical event """
   trace_id = str(uuid.uuid4())
   body["trace_id"] = trace_id
-  logger.info(f"Received event vertical request with a trace id of {trace_id}")
+  logger.info("Received event vertical request with a trace id of %s", trace_id)
   # response = requests.post(app_config["store_vertical_event"]["url"],
   #                           json = body,
   #                           headers = {"Content-Type": "application/json"})
@@ -121,9 +121,9 @@ def add_vertical(body):
   }
   msg_str = json.dumps(msg)
   producer.produce(msg_str.encode("utf-8"))
-  logger.info(f"msg_str:\n{msg_str}")
+  logger.info("msg_str:\n%s", msg_str)
   # logger.info(f"Returned event vertical response (Id: ${trace_id}) with status f{response.status_code}")
-  logger.info(f"Returned event vertical response (Id: ${trace_id})")
+  logger.info("Returned event vertical response (Id: %s)", trace_id)
 
   return NoContent, 201
 

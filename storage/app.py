@@ -45,8 +45,8 @@ with open(log_conf_file, "r") as f:
   logging.config.dictConfig(log_config)
 
 logger = logging.getLogger("basicLogger")
-logger.info("App Conf File: %s" % app_conf_file)
-logger.info("Log Conf File: %s" % log_conf_file)
+logger.info("App Conf File: %s", app_conf_file)
+logger.info("Log Conf File: %s", log_conf_file)
 
 
 # DB_ENGINE = create_engine("sqlite:///readings.sqlite")
@@ -64,7 +64,7 @@ DB_ENGINE = create_engine(
 )
 Base.metadata.bind = DB_ENGINE
 DB_SESSION = sessionmaker(bind = DB_ENGINE)
-logger.info(f"Connecting to DB ~ Host: {hostname}, Port: {port}, DB: {db_name}")
+logger.info("Connecting to DB ~ Host: %s, Port: %s, DB: %s", hostname, port, db_name)
 
 # def add_speed(body):
 #   """ receives speed event """
@@ -151,11 +151,11 @@ def process_messages():
     try:
       client = KafkaClient(hosts=hostname)
       topic = client.topics[str.encode(app_config["events"]["topic"])]
-      logger.info(f"Connecting to Kafka - attempts: {attempts+1}")
+      logger.info("Connecting to Kafka - attempts: %s", attempts+1)
       break
     except:
       wait_time = app_config["events"]["retry_interval"]
-      logger.error(f"Can't connect to Kafka - retrying in {wait_time}s...")
+      logger.error("Can't connect to Kafka - retrying in %ss...", wait_time)
       time.sleep(wait_time)
       attempts += 1
   
@@ -170,7 +170,7 @@ def process_messages():
   event_log_topic = client.topics[str.encode(app_config["events"]["topic2"])]
   event_log_producer = event_log_topic.get_sync_producer()
   event_log_producer.produce(event_log_message_str.encode("utf-8"))
-  logger.info(f"Published message to event_log:\n{event_log_message_str}")
+  logger.info("Published message to event_log:\n%s", event_log_message_str)
 
   # Create a consume on a consumer group, that only reads new messages
   # (uncommitted messages) when the service re-starts (i.e., it doesn't
@@ -198,7 +198,7 @@ def process_messages():
       session.add(speed_event)
       session.commit()
       session.close()
-      logger.debug(f"Stored event speed request with trace_id {payload['trace_id']}")
+      logger.debug("Stored event speed request with trace_id %s", payload['trace_id'])
     elif msg["type"] == "vertical":
       # Store the event2 (i.e., the payload) to the DB
       session = DB_SESSION()
@@ -210,7 +210,7 @@ def process_messages():
       session.add(vert_event)
       session.commit()
       session.close()
-      logger.debug(f"Stored event vertical request with trace_id {payload['trace_id']}")
+      logger.debug("Stored event vertical request with trace_id %s", payload['trace_id'])
 
     # Commit the new message as being read
     consumer.commit_offsets()
