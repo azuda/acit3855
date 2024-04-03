@@ -56,14 +56,14 @@ DB_SESSION = sessionmaker(bind=DB_ENGINE)
 def event_log(code):
   message_limit = app_config["event_log"]["limit"]
 
-  if code == 0003:
+  if code == "0003":
     event_log_message = {
       "id": str(uuid.uuid4()),
       "message": "0003 ~ Processing service successfully started",
       "code": "0003",
       "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
     }
-  if code == 0004:
+  if code == "0004":
     event_log_message = {
       "id": str(uuid.uuid4()),
       "message": f"0004 ~ Service received too many messages (limit: {message_limit})",
@@ -121,7 +121,7 @@ def populate_stats():
   # log event if message limit is reached
   message_limit = app_config["event_log"]["limit"] 
   if count >= message_limit:
-    event_log(0004)
+    event_log("0004")
 
   # populate stats table if empty
   if current_stats == []:
@@ -215,7 +215,7 @@ def init_scheduler():
                 seconds=app_config["scheduler"]["period_sec"],
                 max_instances=2)
   sched.start()
-  event_log(0003)
+  event_log("0003")
 
 
 app = connexion.FlaskApp(__name__, specification_dir="")
