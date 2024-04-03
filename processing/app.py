@@ -1,4 +1,4 @@
-import connexion, yaml, logging, logging.config, json, requests, datetime, os, uuid
+import connexion, yaml, logging, logging.config, json, requests, datetime, os, uuid, time
 from connexion import NoContent
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -71,11 +71,25 @@ def event_log(code):
       "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
     }
   event_log_message_str = json.dumps(event_log_message)
-  hostname = app_config["event_log"]["hostname"]
-  port = app_config["event_log"]["port"]
-  host = f"{hostname}:{port}"
-  client = KafkaClient(hosts=host)
-  event_log_topic = client.topics[str.encode(app_config["event_log"]["topic2"])]
+
+  hostname = "%s:%d" % (app_config["event_log"]["hostname"],
+                        app_config["event_log"]["port"])
+
+  attempts = 0
+  while attempts < app_config["event_log"]["max_retries"]:
+    try:
+      client = KafkaClient(hosts=hostname)
+      event_log_topic = client.topics[str.encode(app_config["event_log"]["topic2"])]
+      logger.info(f"Connecting to Kafka - attempts: {attempts+1}")
+      break
+    except:
+      wait_time = app_config["event_log"]["retry_interval"]
+      logger.error(f"Can't connect to Kafka - retrying in {wait_time}s...")
+      time.sleep(wait_time)
+      attempts += 1
+
+  # client = KafkaClient(hosts=hostname)
+  # event_log_topic = client.topics[str.encode(app_config["event_log"]["topic2"])]
   event_log_producer = event_log_topic.get_sync_producer()
   event_log_producer.produce(event_log_message_str.encode("utf-8"))
   logger.info(f"Published message to event_log:\n{event_log_message_str}")
