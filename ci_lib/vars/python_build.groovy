@@ -11,7 +11,7 @@ def call(service, dockerRepoName, imageName) {
 
       stage("Lint") {
         steps {
-          sh "pylint --fail-under=5 ${service}/*.py"
+          sh "pylint --fail-under=5 --indent-string='  ' ${service}/*.py"
         }
       }
 
