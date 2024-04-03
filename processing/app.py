@@ -53,6 +53,33 @@ Base.metadata.bind = DB_ENGINE
 DB_SESSION = sessionmaker(bind=DB_ENGINE)
 
 
+def event_log(code):
+  message_limit = app_config["event_log"]["limit"]
+
+  if code == 0003:
+    event_log_message = {
+      "id": str(uuid.uuid4()),
+      "message": "0003 ~ Processing service successfully started",
+      "code": "0003",
+      "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    }
+  if code == 0004:
+    event_log_message = {
+      "id": str(uuid.uuid4()),
+      "message": f"0004 ~ Service received too many messages (limit: {message_limit})",
+      "code": "0004",
+      "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    }
+  event_log_message_str = json.dumps(event_log_message)
+  hostname = app_config["event_log"]["hostname"]
+  port = app_config["event_log"]["port"]
+  host = f"{hostname}:{port}"
+  client = KafkaClient(hosts=host)
+  event_log_topic = client.topics[str.encode(app_config["event_log"]["topic2"])]
+  event_log_producer = event_log_topic.get_sync_producer()
+  event_log_producer.produce(event_log_message_str.encode("utf-8"))
+  logger.info(f"Published message to event_log:\n{event_log_message_str}")
+
 def get_stats():
   """ gets processed stats of readings """
   logger.info("Request for get_stats started")
@@ -189,34 +216,6 @@ def init_scheduler():
                 max_instances=2)
   sched.start()
   event_log(0003)
-
-
-def event_log(code):
-  message_limit = app_config["event_log"]["limit"]
-
-  if code == 0003:
-    event_log_message = {
-      "id": str(uuid.uuid4()),
-      "message": "0003 ~ Processing service successfully started",
-      "code": "0003",
-      "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-    }
-  if code == 0004:
-    event_log_message = {
-      "id": str(uuid.uuid4()),
-      "message": f"0004 ~ Service received too many messages (limit: {message_limit})",
-      "code": "0004",
-      "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-    }
-  event_log_message_str = json.dumps(event_log_message)
-  hostname = app_config["event_log"]["hostname"]
-  port = app_config["event_log"]["port"]
-  host = f"{hostname}:{port}"
-  client = KafkaClient(hosts=host)
-  event_log_topic = client.topics[str.encode(app_config["event_log"]["topic2"])]
-  event_log_producer = event_log_topic.get_sync_producer()
-  event_log_producer.produce(event_log_message_str.encode("utf-8"))
-  logger.info(f"Published message to event_log:\n{event_log_message_str}")
 
 
 app = connexion.FlaskApp(__name__, specification_dir="")
