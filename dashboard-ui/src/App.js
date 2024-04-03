@@ -22,7 +22,7 @@ function App() {
                 {rendered_endpoints}
             </div>
             <div>
-                <h1>Event Counts</h1>
+                <h1>Logged Event Counts</h1>
                 <EndpointEvents/>
             </div>
         </div>

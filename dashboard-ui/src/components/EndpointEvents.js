@@ -29,9 +29,8 @@ export default function EndpointEvents() {
     } else {
         return (
             <div>
-                <h2>Logged Event Counts</h2>
                 {Object.entries(counts).map(([code, count]) => (
-                    <div key={code}>{code}: {count}</div>
+                    <div key={code}><strong>{code} Events Logged:</strong> {count}</div>
                 ))}
             </div>
         );
