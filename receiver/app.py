@@ -1,6 +1,14 @@
-import connexion, json, datetime, requests, time, os
+import datetime
+import json
+import logging
+import logging.config
+import os
+import time
+import uuid
+import connexion
+import requests
+import yaml
 from connexion import NoContent
-import yaml, logging, logging.config, uuid
 from pykafka import KafkaClient
 
 
