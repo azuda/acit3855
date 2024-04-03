@@ -8,3 +8,4 @@ mysql-connector-python==8.0.23
 pymysql==1.0.2
 requests==2.25.1
 flask_cors==4.0.0
+pykafka==2.4.0
