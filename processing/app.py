@@ -151,7 +151,8 @@ def populate_stats():
     logger.info("Stats table is empty - adding default values")
     # print("Stats table is empty - adding default values")
     defaults = Stats(0, 0, 0, 0,
-                    datetime.datetime.strptime("2001-02-10T00:00:00.123456", "%Y-%m-%dT%H:%M:%S.%f"))
+                    datetime.datetime.strptime("2001-02-10T00:00:00.123456",
+                                               "%Y-%m-%dT%H:%M:%S.%f"))
     session = DB_SESSION()
     session.add(defaults)
     session.commit()
