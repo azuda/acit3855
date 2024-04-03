@@ -3,6 +3,10 @@ def call(dockerRepoName, imageName) {
   pipeline {
     agent any
 
+    parameters {
+      booleanParam(defaultValue: false, name: "DEPLOY", description: "Deploy the App")
+    }
+
     stages {
 
       stage("Lint") {
@@ -29,10 +33,12 @@ def call(dockerRepoName, imageName) {
       }
 
       stage("Deploy") {
+        when {
+          expression { params.DEPLOY }
+        }
         steps {
-          withCredentials([sshUserPrivateKey(credentialsId: "sshKey", keyFileVariable: "SSH_KEY")]) {
-            sh "ssh -i $SSH_KEY azureuser@172.210.192.73 'docker pull azuda/${dockerRepoName}:${imageName} && docker-compose up -d'"
-          }
+          sh "docker stop ${dockerRepoName} || true && docker rm ${dockerRepoName} || true"
+          sh "docker run -d -p ${portNum}:${portNum} --name ${dockerRepoName} ${dockerRepoName}:latest"
         }
       }
 
