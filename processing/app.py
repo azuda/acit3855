@@ -168,11 +168,13 @@ def populate_stats():
   speed_response = requests.get(app_config["eventstore"]["url"] + "/readings/speed",
                                 headers={"Content-Type": "application/json"},
                                 params={"start_time": start + "+00:00",
-                                        "end_time": current + "+00:00"})
+                                        "end_time": current + "+00:00"},
+                                timeout=15)
   vertical_response = requests.get(app_config["eventstore"]["url"] + "/readings/vertical",
                                     headers={"Content-Type": "application/json"},
                                     params={"start_time": start + "+00:00",
-                                            "end_time": current + "+00:00"})
+                                            "end_time": current + "+00:00"},
+                                    timeout=15)
   speed_events = speed_response.json()
   vertical_events = vertical_response.json()
 
