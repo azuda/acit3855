@@ -17,8 +17,12 @@ def call(service, dockerRepoName, imageName) {
 
       stage("Security Scan") {
         steps {
-          sh "pip install bandit"
-          sh "bandit -r ."
+          sh """
+          python3 -m venv .venv
+          source .venv/bin/activate
+          pip install bandit
+          bandit -r .
+          """
         }
       }
 
