@@ -190,24 +190,24 @@ def process_messages():
     if msg["type"] == "speed":
       # Store the event1 (i.e., the payload) to the DB
       session = DB_SESSION()
-      s = Speed(payload['user_id'],
-                payload['resort_name'],
-                payload['timestamp'],
-                payload['speed'],
-                payload['trace_id'])
-      session.add(s)
+      speed_event = Speed(payload['user_id'],
+                          payload['resort_name'],
+                          payload['timestamp'],
+                          payload['speed'],
+                          payload['trace_id'])
+      session.add(speed_event)
       session.commit()
       session.close()
       logger.debug(f"Stored event speed request with trace_id {payload['trace_id']}")
     elif msg["type"] == "vertical":
       # Store the event2 (i.e., the payload) to the DB
       session = DB_SESSION()
-      v = Vertical(payload['user_id'],
-                payload['resort_name'],
-                payload['timestamp'],
-                payload['vertical'],
-                payload['trace_id'])
-      session.add(v)
+      vert_event = Vertical(payload['user_id'],
+                            payload['resort_name'],
+                            payload['timestamp'],
+                            payload['vertical'],
+                            payload['trace_id'])
+      session.add(vert_event)
       session.commit()
       session.close()
       logger.debug(f"Stored event vertical request with trace_id {payload['trace_id']}")
@@ -219,12 +219,12 @@ def parse_datetime_with_tz(dt_str):
   match = re.match(r"(.*)(\.\d+)([-+]\d+:\d+)", dt_str)
   if match is not None:
     dt_str, us_str, tz_str = match.groups()
-    us = int(us_str.lstrip("."), 10)
+    micro_sec = int(us_str.lstrip("."), 10)
     tz_hours, tz_minutes = map(int, tz_str.split(":"))
     tz_delta = datetime.timedelta(hours=tz_hours, minutes=tz_minutes)
-    tz = datetime.timezone(tz_delta)
-    dt = datetime.datetime.strptime(dt_str, "%Y-%m-%dT%H:%M:%S")
-    return dt.replace(microsecond=us, tzinfo=tz)
+    t_zone = datetime.timezone(tz_delta)
+    out_dt = datetime.datetime.strptime(dt_str, "%Y-%m-%dT%H:%M:%S")
+    return out_dt.replace(microsecond=micro_sec, tzinfo=t_zone)
 
 
 

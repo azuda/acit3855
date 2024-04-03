@@ -83,8 +83,10 @@ def add_speed(body):
   trace_id = str(uuid.uuid4())
   body["trace_id"] = trace_id
   logger.info(f"Received event speed request with a trace id of {trace_id}")
-  # response = requests.post(app_config["store_speed_event"]["url"], json = body, headers = {"Content-Type": "application/json"})
-  
+  # response = requests.post(app_config["store_speed_event"]["url"],
+  #                           json = body,
+  #                           headers = {"Content-Type": "application/json"})
+
   # client = KafkaClient(hosts=f"{app_config["events"]["hostname"]}:{app_config["events"]["port"]}")
   # topic = client.topics[str.encode(app_config["events"]["topic"])]
   # producer = topic.get_sync_producer()
@@ -96,7 +98,6 @@ def add_speed(body):
   msg_str = json.dumps(msg)
   producer.produce(msg_str.encode("utf-8"))
   logger.info(f"msg_str:\n{msg_str}")
-  # logger.info(f"Returned event speed response (Id: ${trace_id}) with status f{response.status_code}")
   logger.info(f"Returned event speed response (Id: ${trace_id})")
 
   return NoContent, 201
@@ -106,8 +107,10 @@ def add_vertical(body):
   trace_id = str(uuid.uuid4())
   body["trace_id"] = trace_id
   logger.info(f"Received event vertical request with a trace id of {trace_id}")
-  # response = requests.post(app_config["store_vertical_event"]["url"], json = body, headers = {"Content-Type": "application/json"})
-  
+  # response = requests.post(app_config["store_vertical_event"]["url"],
+  #                           json = body,
+  #                           headers = {"Content-Type": "application/json"})
+
   # client = KafkaClient(hosts=f'{app_config["events"]["hostname"]}:{app_config["events"]["port"]}')
   # topic = client.topics[str.encode(app_config["events"]["topic"])]
   # producer = topic.get_sync_producer()
