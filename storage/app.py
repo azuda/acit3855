@@ -158,7 +158,7 @@ def process_messages():
   "datetime": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
   }
   event_log_message_str = json.dumps(event_log_message)
-  event_log_topic = client.topics[str.encode(app_config["event_log"]["topic"])]
+  event_log_topic = client.topics[str.encode(app_config["events"]["topic2"])]
   event_log_producer = event_log_topic.get_sync_producer()
   event_log_producer.produce(event_log_message_str.encode("utf-8"))
   logger.info(f"Published message to event_log:\n{event_log_message_str}")

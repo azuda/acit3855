@@ -213,7 +213,7 @@ def event_log(code):
   port = app_config["event_log"]["port"]
   host = f"{hostname}:{port}"
   client = KafkaClient(hosts=host)
-  event_log_topic = client.topics[str.encode(app_config["event_log"]["topic"])]
+  event_log_topic = client.topics[str.encode(app_config["event_log"]["topic2"])]
   event_log_producer = event_log_topic.get_sync_producer()
   event_log_producer.produce(event_log_message_str.encode("utf-8"))
   logger.info(f"Published message to event_log:\n{event_log_message_str}")
