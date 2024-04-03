@@ -1,4 +1,13 @@
-import connexion, yaml, logging, logging.config, json, requests, datetime, os, uuid, time
+import datetime
+import json
+import logging
+import logging.config
+import os
+import time
+import uuid
+import connexion
+import requests
+import yaml
 from connexion import NoContent
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -133,7 +142,7 @@ def populate_stats():
   session.close()
 
   # log event if message limit is reached
-  message_limit = app_config["event_log"]["limit"] 
+  message_limit = app_config["event_log"]["limit"]
   if count >= message_limit:
     event_log("0004")
 
@@ -186,7 +195,7 @@ def populate_stats():
     max_speed = max_speed_now
   else:
     max_speed = current_stats[0].max_speed_reading
-  
+
   if current_stats[0].max_vertical_reading < max_vertical_now:
     max_vertical = max_vertical_now
   else:
