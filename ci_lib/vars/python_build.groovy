@@ -1,4 +1,4 @@
-def call(dockerRepoName, imageName) {
+def call(service, dockerRepoName, imageName) {
 
   pipeline {
     agent any
@@ -11,7 +11,7 @@ def call(dockerRepoName, imageName) {
 
       stage("Lint") {
         steps {
-          sh "pylint --fail-under=5 *.py"
+          sh "pylint --fail-under=5 ${service}/*.py"
         }
       }
 
