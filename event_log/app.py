@@ -39,7 +39,7 @@ if not os.path.exists(datastore):
 
 def process_messages():
   """ process event_log messages """
-  logger.info("Periodic processing started")
+  logger.info("Processing messages started")
 
   hostname = "%s:%d" % (app_config["event_log"]["hostname"],
                         app_config["event_log"]["port"])
@@ -61,20 +61,19 @@ def process_messages():
                                         reset_offset_on_start=False,
                                         auto_offset_reset=OffsetType.LATEST)
 
-  # This is blocking - it will wait for a new message
   for msg in consumer:
     msg_str = msg.value.decode("utf-8")
     msg = json.loads(msg_str)
     logger.info("Message: %s" % msg)
 
-    payload = msg["payload"]
+    # payload = msg["payload"]
 
     # load datastore and add new message
     with open(datastore, "r") as f:
       data = json.loads(f.read())
 
-    data.append(payload)
-    logger.info(f"Message added to file {datastore}: {payload}")
+    data.append(msg)
+    logger.info(f"Message added to file {datastore}: {msg}")
 
     with open(datastore, "w") as f:
       f.write(json.dumps(data, indent=4))
@@ -105,19 +104,12 @@ def event_stats():
 
   return results, 200
 
-def init_scheduler():
-  sched = BackgroundScheduler(daemon=True)
-  sched.add_job(process_messages, "interval",
-                seconds=app_config["scheduler"]["period_sec"])
-  sched.start()
-
 
 app = connexion.FlaskApp(__name__, specification_dir="")
 app.add_api("openapi.yaml", strict_validation=True, validate_responses=True)
 
 
 if __name__ == "__main__":
-  # init_scheduler()
   t1 = Thread(target=process_messages, daemon=True)
   t1.start()
   app.run(port=8120)
