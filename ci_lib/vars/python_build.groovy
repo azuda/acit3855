@@ -45,8 +45,12 @@ def call(service, dockerRepoName, imageName, portNum) {
           expression { params.DEPLOY }
         }
         steps {
-          sh "docker stop ${dockerRepoName} || true && docker rm ${dockerRepoName} || true"
-          sh "docker run -d -p ${portNum}:${portNum} --name ${dockerRepoName} ${dockerRepoName}:latest"
+          sshagent(["kafka_vm_ssh"]) {
+            sh """
+            ssh -o StrictHostKeyChecking=no azureuser@172.210.192.73 "docker pull ${dockerRepoName}:latest"
+            ssh -o StrictHostKeyChecking=no azureuser@172.210.192.73 "cd /home/azureuser/acit3855/deployment && docker-compose up -d --no-deps --build ${service}"
+            """
+          }
         }
       }
 
