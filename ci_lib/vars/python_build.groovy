@@ -46,10 +46,12 @@ def call(service, dockerRepoName, imageName, portNum) {
         }
         steps {
           sshagent(["kafka_vm_ssh"]) {
-            sh """
-            ssh -o StrictHostKeyChecking=no azureuser@172.210.192.73 "docker pull ${dockerRepoName}:latest"
-            ssh -o StrictHostKeyChecking=no azureuser@172.210.192.73 "cd /home/azureuser/acit3855/deployment && docker-compose up -d --no-deps --build ${service}"
-            """
+            withCredentials([string(credentialsId: "DockerHub", variable: "TOKEN")]) {
+              sh """
+              ssh -o StrictHostKeyChecking=no azureuser@172.210.192.73 "docker pull ${dockerRepoName}:latest"
+              ssh -o StrictHostKeyChecking=no azureuser@172.210.192.73 "cd /home/azureuser/acit3855/deployment && docker-compose up -d --no-deps --build ${service}"
+              """
+            }
           }
         }
       }
