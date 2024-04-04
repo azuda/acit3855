@@ -45,11 +45,11 @@ def call(service, dockerRepoName, imageName, portNum) {
           expression { params.DEPLOY }
         }
         steps {
-          sshagent(['kafka_vm_ssh']) {
-            withCredentials([string(credentialsId: 'DockerHub', variable: 'TOKEN')]) {
+          sshagent(["kafka_vm_ssh"]) {
+            withCredentials([string(credentialsId: "DockerHub", variable: "TOKEN")]) {
               sh """
               ssh -o StrictHostKeyChecking=no azureuser@172.210.192.73 "echo '$TOKEN' | docker login --username azuda --password-stdin"
-              ssh -o StrictHostKeyChecking=no azureuser@172.210.192.73 "docker pull ${dockerRepoName}:latest"
+              ssh -o StrictHostKeyChecking=no azureuser@172.210.192.73 "docker pull azuda/${dockerRepoName}:latest"
               ssh -o StrictHostKeyChecking=no azureuser@172.210.192.73 "cd /home/azureuser/acit3855/deployment && docker-compose up -d --no-deps --build ${service}"
               """
             }
