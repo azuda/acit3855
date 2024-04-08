@@ -61,10 +61,10 @@ DB_ENGINE = create_engine("sqlite:///%s" % filename)
 Base.metadata.bind = DB_ENGINE
 DB_SESSION = sessionmaker(bind=DB_ENGINE)
 
+message_limit = app_config["event_log"]["limit"]
+
 
 def event_log(code):
-  message_limit = app_config["event_log"]["limit"]
-
   if code == "0003":
     event_log_message = {
       "id": str(uuid.uuid4()),
@@ -141,11 +141,6 @@ def populate_stats():
   count = session.query(Stats).count()
   session.close()
 
-  # log event if message limit is reached
-  message_limit = app_config["event_log"]["limit"]
-  if count >= message_limit:
-    event_log("0004")
-
   # populate stats table if empty
   if current_stats == []:
     logger.info("Stats table is empty - adding default values")
@@ -177,6 +172,11 @@ def populate_stats():
                                     timeout=15)
   speed_events = speed_response.json()
   vertical_events = vertical_response.json()
+
+  # log event if message limit is reached
+  total_events = len(speed_events) + len(vertical_events)
+  if total_events > message_limit:
+    event_log("0004")
 
   # handle status codes from storage service
   if speed_response.status_code != 200:
