@@ -52,7 +52,7 @@ services:
       - my-db:/var/lib/mysql
 
   receiver:
-    image: azuda/receiver
+    image: azuda/receiver:svc_receiver
     labels:
       - "svc_receiver"
     ports:
@@ -66,7 +66,7 @@ services:
       - "kafka"
 
   storage:
-    image: azuda/storage
+    image: azuda/storage:svc_storage
     labels:
       - "svc_storage"
     ports:
@@ -81,7 +81,7 @@ services:
       - "db"
 
   processing:
-    image: azuda/processing
+    image: azuda/processing:svc_processing
     labels:
       - "svc_processing"
     ports:
