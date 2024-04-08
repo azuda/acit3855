@@ -53,6 +53,8 @@ services:
 
   receiver:
     image: azuda/receiver
+    labels:
+      - "svc_receiver"
     ports:
       - "8080:8080"
     environment:
@@ -65,6 +67,8 @@ services:
 
   storage:
     image: azuda/storage
+    labels:
+      - "svc_storage"
     ports:
       - "8090:8090"
     environment:
@@ -78,6 +82,8 @@ services:
 
   processing:
     image: azuda/processing
+    labels:
+      - "svc_processing"
     ports:
       - "8100:8100"
     network_mode: "host"
