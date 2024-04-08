@@ -133,6 +133,7 @@ def get_stats():
 def populate_stats():
   """ periodically update stats """
   logger.info("Period processing started")
+  logger.info("Demo ------------------------------------")
   # print("Period processing started")
 
   # read stats sorted by last_updated
