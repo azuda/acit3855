@@ -110,15 +110,15 @@ def process_messages():
 
 
     if msg["type"] == "speed":
-      if payload["speed"] > app_config["anomaly"]["speed_cap"]:
+      if payload["speed"] < app_config["anomaly"]["speed_cap"]:
         # store the speed anomaly
         logger.info("Storing speed anomaly")
         speed_anomaly = {
           "event_id": payload["user_id"],
           "trace_id": payload["trace_id"],
           "event_type": msg["type"],
-          "anomaly_type": "TooHigh",
-          "description": "Speed is too high"
+          "anomaly_type": "TooLow",
+          "description": "Speed is too low"
         }
         try:
           row = Anomaly(**speed_anomaly)

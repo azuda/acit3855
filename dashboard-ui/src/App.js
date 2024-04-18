@@ -4,6 +4,7 @@ import './App.css';
 import EndpointAudit from './components/EndpointAudit'
 import AppStats from './components/AppStats'
 import EndpointEvents from './components/EndpointEvents';
+import EndpointAnomalies from './components/EndpointAnomalies';
 
 function App() {
 
@@ -24,6 +25,10 @@ function App() {
             <div>
                 <h1>Logged Event Counts</h1>
                 <EndpointEvents/>
+            </div>
+            <div>
+                <h1>Anomalies</h1>
+                <EndpointAnomalies/>
             </div>
         </div>
     );
