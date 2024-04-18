@@ -84,6 +84,7 @@ def get_anomalies():
     msg_str = msg.value.decode("utf-8")
     msg = json.loads(msg_str)
     logger.info("Message: %s" % msg)
+    logger.info("Message body: %s" % msg["payload"])
 
   #   # load datastore and add new message
   #   with open(filename, "r") as f:
