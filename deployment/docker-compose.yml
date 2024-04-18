@@ -131,8 +131,23 @@ services:
       - "kafka"
       - "storage"
 
+  anomaly_detector:
+    image: anomaly_detector
+    ports:
+      - "8130:8130"
+    environment:
+      - TARGET_ENV=test
+    volumes:
+      - /home/azureuser/config/anomaly_detector:/config
+      - /home/azureuser/logs:/logs
+      - anomaly-db:/data
+    depends_on:
+      - "kafka"
+      - "storage"
+
 # name our volumes
 volumes:
   my-db:
   processing-db:
   event-db:
+  anomaly-db:

@@ -1,0 +1,16 @@
+version: 1
+datastore:
+  filename: anomaly.sqlite
+scheduler:
+  period_sec: 10
+eventstore:
+  url: http://localhost:8090
+event_anomaly:
+  hostname: kafka-acit3855.eastus2.cloudapp.azure.com
+  port: 9092
+  topic: event_anomaly
+  max_retries: 10
+  retry_interval: 10
+anomaly:
+  speed_cap: 90
+  vertical_cap: 2700
