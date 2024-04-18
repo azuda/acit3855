@@ -73,16 +73,24 @@ while attempts < app_config["events"]["max_retries"]:
     attempts += 1
 
 
+logger.info("Speed anomaly threshold is:" + str(app_config["anomaly"]["speed_cap"]))
+logger.info("Vertical anomaly threshold is:" + str(app_config["anomaly"]["vertical_cap"]))
+
+
 def get_anomalies():
   """ gets anomalies """
-  logger.info("Request for get_anomalies started")
+  logger.info("Request for get_anomalies received")
 
   # read anomalies from anomaly.sqlite
   session = DB_SESSION()
   anomalies = session.query(Anomaly).all()
   session.close()
+
+  if anomalies == []:
+    logger.error("No anomalies found")
+    return NoContent, 404
   
-  logger.info("Request for get_anomalies completed")
+  logger.info("Request for get_anomalies returned")
   return anomalies, 200
 
 def process_messages():
@@ -110,9 +118,9 @@ def process_messages():
   for msg in consumer:
     msg_str = msg.value.decode("utf-8")
     msg = json.loads(msg_str)
-    logger.info("Message: %s" % msg)
-
     payload = msg["payload"]
+    logger.info("Message consumed payload: %s" % payload)
+
 
     if msg["type"] == "speed":
       if payload["speed"] > app_config["anomaly"]["speed_cap"]:
@@ -126,7 +134,7 @@ def process_messages():
         session.add(speed_anomaly)
         session.commit()
         session.close()
-        logger.debug("Stored event speed request with trace_id %s", payload["trace_id"])
+        logger.debug("Stored speed anomaly with trace_id %s", payload["trace_id"])
     elif msg["type"] == "vertical":
       if payload["vertical"] > app_config["anomaly"]["vertical_cap"]:
         # store the vertical anomaly
