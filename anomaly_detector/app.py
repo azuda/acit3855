@@ -110,8 +110,10 @@ def process_messages():
     if msg["type"] == "speed":
       if payload["speed"] > app_config["anomaly"]["speed_cap"]:
         # store the speed anomaly
+        logger.info("Storing speed anomaly")
         session = DB_SESSION()
-        speed_anomaly = Anomaly(payload["user_id"],
+        speed_anomaly = Anomaly(str(uuid.uuid4()),
+                                payload["user_id"],
                                 payload["trace_id"],
                                 msg["type"],
                                 "TooHigh",
@@ -124,8 +126,10 @@ def process_messages():
     elif msg["type"] == "vertical":
       if payload["vertical"] > app_config["anomaly"]["vertical_cap"]:
         # store the vertical anomaly
+        logger.info("Storing vertical anomaly")
         session = DB_SESSION()
-        vertical_anomaly = Anomaly(payload["user_id"],
+        vertical_anomaly = Anomaly(str(uuid.uuid4()),
+                                   payload["user_id"],
                                    payload["trace_id"],
                                    msg["type"],
                                    "TooHigh",
