@@ -78,7 +78,7 @@ logger.info("Speed anomaly threshold is:\t" + str(app_config["anomaly"]["speed_c
 logger.info("Vertical anomaly threshold is:\t" + str(app_config["anomaly"]["vertical_cap"]))
 
 
-def get_anomalies():
+def get_anomalies(anomaly_type):
   """ gets anomalies """
   logger.info("Request for get_anomalies received")
 
@@ -90,7 +90,9 @@ def get_anomalies():
   if anomalies == []:
     logger.error("No anomalies found")
     return NoContent, 404
-  
+
+  anomalies = [a.to_dict() for a in anomalies if a.anomaly_type == anomaly_type]
+
   logger.info("Request for get_anomalies returned")
   return anomalies, 200
 
