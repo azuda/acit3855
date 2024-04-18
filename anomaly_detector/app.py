@@ -48,6 +48,7 @@ filename = app_config["datastore"]["filename"]
 if not os.path.exists(filename):
   with open(filename, "w") as f:
     f.write("")
+  os.system("python3 create_tables.py")
 
 # link to sqlite
 DB_ENGINE = create_engine("sqlite:///%s" % filename)
@@ -83,7 +84,7 @@ def get_anomalies():
 
   # read anomalies from anomaly.sqlite
   session = DB_SESSION()
-  anomalies = session.query(Anomaly).all()
+  anomalies = session.query(Anomaly).order_by(Anomaly.date_created.desc()).all()
   session.close()
 
   if anomalies == []:
@@ -114,7 +115,8 @@ def process_messages():
                                 payload["trace_id"],
                                 msg["type"],
                                 "TooHigh",
-                                "Speed is too high")
+                                "Speed is too high",
+                                msg["datetime"])
         session.add(speed_anomaly)
         session.commit()
         session.close()
@@ -127,7 +129,8 @@ def process_messages():
                                    payload["trace_id"],
                                    msg["type"],
                                    "TooHigh",
-                                   "Vertical is too high")
+                                   "Vertical is too high",
+                                   msg["datetime"])
         session.add(vertical_anomaly)
         session.commit()
         session.close()
