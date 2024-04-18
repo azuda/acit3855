@@ -116,14 +116,16 @@ def process_messages():
           "trace_id": payload["trace_id"],
           "event_type": msg["type"],
           "anomaly_type": "TooHigh",
-          "description": "Speed is too high",
-          "date_created": msg["datetime"]
+          "description": "Speed is too high"
         }
-        row = Anomaly(**speed_anomaly)
-        session = DB_SESSION()
-        session.add(row)
-        session.commit()
-        session.close()
+        try:
+          row = Anomaly(**speed_anomaly)
+          session = DB_SESSION()
+          session.add(row)
+          session.commit()
+          session.close()
+        except Exception as e:
+          logger.error("An error occurred while storing speed anomaly: %s", e)
         logger.debug("Stored speed anomaly with trace_id %s", payload["trace_id"])
     elif msg["type"] == "vertical":
       if payload["vertical"] > app_config["anomaly"]["vertical_cap"]:
@@ -134,14 +136,16 @@ def process_messages():
           "trace_id": payload["trace_id"],
           "event_type": msg["type"],
           "anomaly_type": "TooHigh",
-          "description": "Vertical is too high",
-          "date_created": msg["datetime"]
+          "description": "Vertical is too high"
         }
-        row = Anomaly(**vertical_anomaly)
-        session = DB_SESSION()
-        session.add(row)
-        session.commit()
-        session.close()
+        try:
+          row = Anomaly(**vertical_anomaly)
+          session = DB_SESSION()
+          session.add(row)
+          session.commit()
+          session.close()
+        except Exception as e:
+          logger.error("An error occurred while storing speed anomaly: %s", e)
         logger.debug("Stored vertical anomaly with trace_id %s", payload["trace_id"])
 
     consumer.commit_offsets()
