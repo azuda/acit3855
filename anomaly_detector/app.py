@@ -16,6 +16,7 @@ from base import Base
 from anomaly import Anomaly
 from flask_cors import CORS
 from pykafka import KafkaClient
+from pykafka.common import OffsetType
 
 
 if "TARGET_ENV" in os.environ and os.environ["TARGET_ENV"] == "test":
@@ -52,22 +53,20 @@ DB_ENGINE = create_engine("sqlite:///%s" % filename)
 Base.metadata.bind = DB_ENGINE
 DB_SESSION = sessionmaker(bind=DB_ENGINE)
 
-message_limit = app_config["event_anomaly"]["limit"]
-
 
 # connect to kafka
-hostname = "%s:%d" % (app_config["event_anomaly"]["hostname"],
-                      app_config["event_anomaly"]["port"])
+hostname = "%s:%d" % (app_config["events"]["hostname"],
+                      app_config["events"]["port"])
 
 attempts = 0
-while attempts < app_config["event_anomaly"]["max_retries"]:
+while attempts < app_config["events"]["max_retries"]:
   try:
     client = KafkaClient(hosts=hostname)
-    topic = client.topics[str.encode(app_config["event_anomaly"]["topic"])]
+    topic = client.topics[str.encode(app_config["events"]["topic"])]
     logger.info(f"Connecting to Kafka - attempts: {attempts+1}")
     break
   except:
-    wait_time = app_config["event_anomaly"]["retry_interval"]
+    wait_time = app_config["events"]["retry_interval"]
     logger.error(f"Can't connect to Kafka - retrying in {wait_time}s...")
     time.sleep(wait_time)
     attempts += 1
@@ -77,29 +76,49 @@ def get_anomalies():
   """ gets anomalies """
   logger.info("Request for get_anomalies started")
 
-  # read recent anomalies
-  session = DB_SESSION()
-  anomalies = session.query(Anomaly)#.order_by(Anomaly.last_updated.desc()).first()
-  session.close()
+  consumer = topic.get_simple_consumer(consumer_group=b'event_group',
+                                      reset_offset_on_start=False,
+                                      auto_offset_reset=OffsetType.LATEST)
 
-  # return 404 if no anomalies found
-  if anomalies == []:
-    logger.error("No anomalies found")
-    return "Anomalies do not exist", 404
+  for msg in consumer:
+    msg_str = msg.value.decode("utf-8")
+    msg = json.loads(msg_str)
+    logger.info("Message: %s" % msg)
 
-  # return anomaly
-  response = {
-    "id":           anomalies.id,
-    "event_id":     anomalies.event_id,
-    "trace_id":     anomalies.trace_id,
-    "event_type":   anomalies.event_type,
-    "anomaly_type": anomalies.anomaly_type,
-    "description":  anomalies.description
-  }
-  logger.debug(f"Response:\n{json.dumps(response, indent=2)}")
+  #   # load datastore and add new message
+  #   with open(filename, "r") as f:
+  #     data = json.loads(f.read())
 
-  logger.info("Request for get_anomalies completed")
-  return response, 200
+  #   data.append(msg)
+  #   logger.info(f"Message added to file {filename}: {msg}")
+
+  #   with open(filename, "w") as f:
+  #     f.write(json.dumps(data, indent=4))
+
+  #   logger.debug(f"Stored event_log message to {filename}")
+
+  #   # read recent anomalies
+  #   session = DB_SESSION()
+  #   anomalies = session.query(Anomaly)#.order_by(Anomaly.last_updated.desc()).first()
+  #   session.close()
+
+  #   # Commit the new message as being read
+  #   consumer.commit_offsets()
+
+  # # return anomaly
+  # response = {
+  #   "id":           anomalies.id,
+  #   "event_id":     anomalies.event_id,
+  #   "trace_id":     anomalies.trace_id,
+  #   "event_type":   anomalies.event_type,
+  #   "anomaly_type": anomalies.anomaly_type,
+  #   "description":  anomalies.description
+  # }
+  # logger.debug(f"Response:\n{json.dumps(response, indent=2)}")
+
+  # logger.info("Request for get_anomalies completed")
+  # return response, 200
+  return
 
 # def init_scheduler():
 #   sched = BackgroundScheduler(daemon=True)

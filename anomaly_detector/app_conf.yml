@@ -5,10 +5,10 @@ scheduler:
   period_sec: 10
 eventstore:
   url: http://localhost:8090
-event_anomaly:
+events:
   hostname: kafka-acit3855.eastus2.cloudapp.azure.com
   port: 9092
-  topic: event_anomaly
+  topic: events
   max_retries: 10
   retry_interval: 10
 anomaly:
