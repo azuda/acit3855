@@ -73,8 +73,8 @@ while attempts < app_config["events"]["max_retries"]:
     attempts += 1
 
 
-logger.info("Speed anomaly threshold is:" + str(app_config["anomaly"]["speed_cap"]))
-logger.info("Vertical anomaly threshold is:" + str(app_config["anomaly"]["vertical_cap"]))
+logger.info("Speed anomaly threshold is:\t" + str(app_config["anomaly"]["speed_cap"]))
+logger.info("Vertical anomaly threshold is:\t" + str(app_config["anomaly"]["vertical_cap"]))
 
 
 def get_anomalies():
@@ -95,22 +95,6 @@ def get_anomalies():
 
 def process_messages():
   """ process event messages """
-  hostname = "%s:%d" % (app_config["events"]["hostname"],
-                        app_config["events"]["port"])
-
-  attempts = 0
-  while attempts < app_config["events"]["max_retries"]:
-    try:
-      client = KafkaClient(hosts=hostname)
-      topic = client.topics[str.encode(app_config["events"]["topic"])]
-      logger.info("Connecting to Kafka - attempts: %s", attempts+1)
-      break
-    except:
-      wait_time = app_config["events"]["retry_interval"]
-      logger.error("Can't connect to Kafka - retrying in %ss...", wait_time)
-      time.sleep(wait_time)
-      attempts += 1
-
   consumer = topic.get_simple_consumer(consumer_group=b'event_group',
                                         reset_offset_on_start=False,
                                         auto_offset_reset=OffsetType.LATEST)
