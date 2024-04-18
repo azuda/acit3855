@@ -111,15 +111,17 @@ def process_messages():
       if payload["speed"] > app_config["anomaly"]["speed_cap"]:
         # store the speed anomaly
         logger.info("Storing speed anomaly")
+        speed_anomaly = {
+          "event_id": payload["user_id"],
+          "trace_id": payload["trace_id"],
+          "event_type": msg["type"],
+          "anomaly_type": "TooHigh",
+          "description": "Speed is too high",
+          "date_created": msg["datetime"]
+        }
+        row = Anomaly(**speed_anomaly)
         session = DB_SESSION()
-        speed_anomaly = Anomaly(str(uuid.uuid4()),
-                                payload["user_id"],
-                                payload["trace_id"],
-                                msg["type"],
-                                "TooHigh",
-                                "Speed is too high",
-                                msg["datetime"])
-        session.add(speed_anomaly)
+        session.add(row)
         session.commit()
         session.close()
         logger.debug("Stored speed anomaly with trace_id %s", payload["trace_id"])
@@ -127,15 +129,17 @@ def process_messages():
       if payload["vertical"] > app_config["anomaly"]["vertical_cap"]:
         # store the vertical anomaly
         logger.info("Storing vertical anomaly")
+        vertical_anomaly = {
+          "event_id": payload["user_id"],
+          "trace_id": payload["trace_id"],
+          "event_type": msg["type"],
+          "anomaly_type": "TooHigh",
+          "description": "Vertical is too high",
+          "date_created": msg["datetime"]
+        }
+        row = Anomaly(**vertical_anomaly)
         session = DB_SESSION()
-        vertical_anomaly = Anomaly(str(uuid.uuid4()),
-                                   payload["user_id"],
-                                   payload["trace_id"],
-                                   msg["type"],
-                                   "TooHigh",
-                                   "Vertical is too high",
-                                   msg["datetime"])
-        session.add(vertical_anomaly)
+        session.add(row)
         session.commit()
         session.close()
         logger.debug("Stored vertical anomaly with trace_id %s", payload["trace_id"])
