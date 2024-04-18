@@ -17,6 +17,7 @@ from anomaly import Anomaly
 from flask_cors import CORS
 from pykafka import KafkaClient
 from pykafka.common import OffsetType
+from threading import Thread
 
 
 if "TARGET_ENV" in os.environ and os.environ["TARGET_ENV"] == "test":
@@ -76,58 +77,71 @@ def get_anomalies():
   """ gets anomalies """
   logger.info("Request for get_anomalies started")
 
+  # read anomalies from anomaly.sqlite
+  session = DB_SESSION()
+  anomalies = session.query(Anomaly).all()
+  session.close()
+  
+  logger.info("Request for get_anomalies completed")
+  return anomalies, 200
+
+def process_messages():
+  """ process event messages """
+  hostname = "%s:%d" % (app_config["events"]["hostname"],
+                        app_config["events"]["port"])
+
+  attempts = 0
+  while attempts < app_config["events"]["max_retries"]:
+    try:
+      client = KafkaClient(hosts=hostname)
+      topic = client.topics[str.encode(app_config["events"]["topic"])]
+      logger.info("Connecting to Kafka - attempts: %s", attempts+1)
+      break
+    except:
+      wait_time = app_config["events"]["retry_interval"]
+      logger.error("Can't connect to Kafka - retrying in %ss...", wait_time)
+      time.sleep(wait_time)
+      attempts += 1
+
   consumer = topic.get_simple_consumer(consumer_group=b'event_group',
-                                      reset_offset_on_start=False,
-                                      auto_offset_reset=OffsetType.LATEST)
+                                        reset_offset_on_start=False,
+                                        auto_offset_reset=OffsetType.LATEST)
 
   for msg in consumer:
     msg_str = msg.value.decode("utf-8")
     msg = json.loads(msg_str)
     logger.info("Message: %s" % msg)
-    logger.info("Message body: %s" % msg["payload"])
 
-  #   # load datastore and add new message
-  #   with open(filename, "r") as f:
-  #     data = json.loads(f.read())
+    payload = msg["payload"]
 
-  #   data.append(msg)
-  #   logger.info(f"Message added to file {filename}: {msg}")
+    if msg["type"] == "speed":
+      if payload["speed"] > app_config["anomaly"]["speed_cap"]:
+        # store the speed anomaly
+        session = DB_SESSION()
+        speed_anomaly = Anomaly(payload["user_id"],
+                                payload["trace_id"],
+                                msg["type"],
+                                "TooHigh",
+                                "Speed is too high")
+        session.add(speed_anomaly)
+        session.commit()
+        session.close()
+        logger.debug("Stored event speed request with trace_id %s", payload["trace_id"])
+    elif msg["type"] == "vertical":
+      if payload["vertical"] > app_config["anomaly"]["vertical_cap"]:
+        # store the vertical anomaly
+        session = DB_SESSION()
+        vertical_anomaly = Anomaly(payload["user_id"],
+                                   payload["trace_id"],
+                                   msg["type"],
+                                   "TooHigh",
+                                   "Vertical is too high")
+        session.add(vertical_anomaly)
+        session.commit()
+        session.close()
+        logger.debug("Stored vertical anomaly with trace_id %s", payload["trace_id"])
 
-  #   with open(filename, "w") as f:
-  #     f.write(json.dumps(data, indent=4))
-
-  #   logger.debug(f"Stored event_log message to {filename}")
-
-  #   # read recent anomalies
-  #   session = DB_SESSION()
-  #   anomalies = session.query(Anomaly)#.order_by(Anomaly.last_updated.desc()).first()
-  #   session.close()
-
-  #   # Commit the new message as being read
-  #   consumer.commit_offsets()
-
-  # # return anomaly
-  # response = {
-  #   "id":           anomalies.id,
-  #   "event_id":     anomalies.event_id,
-  #   "trace_id":     anomalies.trace_id,
-  #   "event_type":   anomalies.event_type,
-  #   "anomaly_type": anomalies.anomaly_type,
-  #   "description":  anomalies.description
-  # }
-  # logger.debug(f"Response:\n{json.dumps(response, indent=2)}")
-
-  # logger.info("Request for get_anomalies completed")
-  # return response, 200
-  return
-
-# def init_scheduler():
-#   sched = BackgroundScheduler(daemon=True)
-#   sched.add_job(populate_stats, "interval",
-#                 seconds=app_config["scheduler"]["period_sec"],
-#                 max_instances=2)
-#   sched.start()
-
+    consumer.commit_offsets()
 
 app = connexion.FlaskApp(__name__, specification_dir="")
 app.add_api("openapi.yaml", strict_validation=True, validate_responses=True)
@@ -135,5 +149,6 @@ app.add_api("openapi.yaml", strict_validation=True, validate_responses=True)
 CORS(app.app, resources={r"/*": {"origins": "*"}})
 
 if __name__ == "__main__":
-  # init_scheduler()
+  t1 = Thread(target=process_messages, daemon=True)
+  t1.start()
   app.run(port=8130)
