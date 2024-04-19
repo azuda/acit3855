@@ -4,7 +4,7 @@ function EndpointAnomalies() {
     const [speedId, setSpeedId] = useState(null);
     const [verticalId, setVerticalId] = useState(null);
 
-    useEffect(() => {
+    const getEventCounts = () => {
         fetch('http://kafka-acit3855.eastus2.cloudapp.azure.com:8130/anomalies?anomaly_type=TooLow')
             .then(response => response.json())
             .then(data => {
@@ -18,6 +18,12 @@ function EndpointAnomalies() {
                 setVerticalId(data.result[0].event_id);
             })
             .catch(error => console.error('Error:', error));
+    };
+
+    useEffect(() => {
+        getEventCounts(); // Fetch immediately on component mount
+        const interval = setInterval(getEventCounts, 2000); // Update every 2 seconds
+        return () => clearInterval(interval);
     }, []);
 
     return (
